@@ -1,5 +1,5 @@
 ---
-title: "Assignment 7-Task 4-6"
+title: "A7"
 format: html
 editor: visual
 execute: 
@@ -10,8 +10,6 @@ execute:
 
 Report Last run `r Sys.time()`
 
-# Task 1 Setup
-
 ```{r}
 library(tidyverse)
 library(data.table) ## For the fread function
@@ -19,10 +17,9 @@ library(lubridate)
 library(knitr)
 library(ggplot2)
 library(kableExtra)
+library(googledrive)
 source("sepsis_monitor_functions.R")
 ```
-
-# Task 4: Make an ICU status report
 
 ```{r}
 ## Calling drive_deauth() prevents R from trying to authenticate via a browser
@@ -42,7 +39,7 @@ most_recent_data <- new_data %>%
 cur.time <- Sys.time()
 ```
 
-## Report
+# Task 4: Make an ICU status report
 
 This report was generated on `r cur.time`.
 
@@ -108,6 +105,7 @@ mutate(Change_HR_color = case_when(
   Change_Resp < 0 ~ "red"),
 )
 summ.tab %>%
+  select(1:5)%>%
   kable(format = "html",escape = FALSE) %>%
   column_spec(3, color = summ.tab$Change_HR_color) %>%
   column_spec(4, color = summ.tab$Change_Temp_color) %>%
