@@ -45,7 +45,7 @@ jobs:
         uses: quarto-dev/quarto-actions/render@v2
         with:
           to: html
-          path: Assignment 7-Task 3-6.qmd
+          path: Assignment 7-Task 4-6.qmd
 
       - name: Setup git config
         run: |
