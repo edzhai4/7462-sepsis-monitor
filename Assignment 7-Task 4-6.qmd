@@ -1,12 +1,11 @@
 ---
 title: "Assignment 7 - Task 3-6"
-format: gfm
+format: html
 editor: visual
 execute: 
   echo: false
   warning: false
   message: false
-
 ---
 
 Report Last run `r Sys.time()`
@@ -21,24 +20,6 @@ library(knitr)
 library(ggplot2)
 library(kableExtra)
 source("sepsis_monitor_functions.R")
-```
-
-# Task 3: Upload to Google Drive
-
-```{r}
-library(googledrive)
-drive_auth(email = "zhaix069@umn.edu")
-df <- makeSepsisDataset()
-# We have to write the file to disk first, then upload it
-df %>% write_csv("sepsis_data_temp.csv")
-
-# Uploading happens here
-sepsis_file <- drive_put(media = "sepsis_data_temp.csv", 
-          path = as_id("https://drive.google.com/drive/folders/1ISDxuQptb8zOHTrmg8YBBGUvQjkClJUW"),
-          name = "sepsis_data.csv")
-
-# Set the file permissions so anyone can download this file.
-sepsis_file %>% drive_share_anyone()
 ```
 
 # Task 4: Make an ICU status report
@@ -76,7 +57,7 @@ sepsis.patid<-most_recent_data %>%
 most_recent_data %>% 
   filter(SepsisLabel == 1) %>%
   summarise("ICU Length of Stay" = ICULOS,"Heart Rate" =HR,"Temperature"=Temp, "Respiratory Rate" = Resp) %>%
-  kable(format = "simple",caption = "Most recent Physio. Data For Those Who Have Sepsis")
+  kable(format = "html",caption = "Most recent Physio. Data For Those Who Have Sepsis")
 
 new_data %>%
   filter(PatientID %in% sepsis.patid == TRUE) %>%
@@ -127,7 +108,7 @@ mutate(Change_HR_color = case_when(
   Change_Resp < 0 ~ "red"),
 )
 summ.tab %>%
-  kable(format = "simple",escape = FALSE) %>%
+  kable(format = "html",escape = FALSE) %>%
   column_spec(3, color = summ.tab$Change_HR_color) %>%
   column_spec(4, color = summ.tab$Change_Temp_color) %>%
   column_spec(5, color = summ.tab$Change_Resp_color) %>%
