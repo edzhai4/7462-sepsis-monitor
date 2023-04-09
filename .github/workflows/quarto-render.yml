@@ -40,18 +40,6 @@ jobs:
                any::data.table
                any::googledrive
                any::anytime
-               any::googleAuthR
-               
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@main
-        with:
-          version: '310.0.0'
-          service_account_email: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
-          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-          
-      - name: Run R script
-        run: |
-          Rscript my_script.R
 
       - name: Render document
         uses: quarto-dev/quarto-actions/render@v2
