@@ -27,9 +27,8 @@ source("sepsis_monitor_functions.R")
 
 ```{r}
 library(googledrive)
-
+drive_auth(email = "zhaix069@umn.edu")
 df <- makeSepsisDataset()
-
 # We have to write the file to disk first, then upload it
 df %>% write_csv("sepsis_data_temp.csv")
 
