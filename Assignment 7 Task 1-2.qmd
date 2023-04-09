@@ -25,6 +25,7 @@ source("sepsis_monitor_functions.R")
 # Task 2 Speedreading
 
 ```{r}
+options(readr.show_col_types = FALSE)
 library(tictoc)
 tic()
 fread50<-makeSepsisDataset(50, "fread")
