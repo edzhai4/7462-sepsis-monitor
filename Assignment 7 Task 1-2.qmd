@@ -1,0 +1,57 @@
+---
+title: "Assignment 7 Task 1-2"
+format: gfm
+editor: visual
+execute: 
+  echo: false
+  warning: false
+  message: false
+---
+
+Report Last run 'r Sys.time()'
+
+# Task 1 Setup
+
+```{r}
+library(tidyverse)
+library(data.table) ## For the fread function
+library(lubridate)
+library(knitr)
+library(ggplot2)
+library(kableExtra)
+source("sepsis_monitor_functions.R")
+```
+
+# Task 2 Speedreading
+
+```{r}
+library(tictoc)
+tic()
+fread50<-makeSepsisDataset(50, "fread")
+fread50.time<-toc()
+tic()
+read_delim50<-makeSepsisDataset(50,"read_delim")
+read_delim50.time<-toc()
+tic()
+fread100<-makeSepsisDataset(100, "fread")
+fread100.time<-toc()
+tic()
+read_delim100<-makeSepsisDataset(100,"read_delim")
+read_delim100.time<-toc()
+tic()
+fread500<-makeSepsisDataset(500, "fread")
+fread500.time<-toc()
+tic()
+read_delim500<-makeSepsisDataset(500,"read_delim")
+read_delim500.time<-toc()
+
+task2.df <- data.frame(c(50,100,500), c(fread50.time$callback_msg,fread100.time$callback_msg,fread500.time$callback_msg), c(read_delim50.time$callback_msg,read_delim100.time$callback_msg,read_delim500.time$callback_msg))
+colnames(task2.df) <- c("n","fread (sec)","read_delim (sec)")
+```
+
+## Task 2 Results
+
+```{r, include = TRUE, echo = FALSE}
+kable(task2.df, caption = "Comparing times of fread and read_delim with varying sample sizes n")
+```
+
