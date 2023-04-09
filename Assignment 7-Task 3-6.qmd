@@ -1,0 +1,138 @@
+---
+title: "Assignment 7 - Task 3-6"
+format: html
+editor: visual
+execute: 
+  echo: false
+  warning: false
+  message: false
+---
+
+Report Last run `r Sys.time()`
+
+# Task 1 Setup
+
+```{r}
+library(tidyverse)
+library(data.table) ## For the fread function
+library(lubridate)
+library(knitr)
+library(ggplot2)
+library(kableExtra)
+source("sepsis_monitor_functions.R")
+```
+
+# Task 3: Upload to Google Drive
+
+```{r}
+library(googledrive)
+
+# now any new OAuth tokens are obtained with the configured client
+df <- makeSepsisDataset()
+# We have to write the file to disk first, then upload it
+df %>% write_csv("sepsis_data_temp.csv")
+
+# Uploading happens here
+sepsis_file <- drive_put(media = "sepsis_data_temp.csv", 
+          path = as_id("https://drive.google.com/drive/folders/1ISDxuQptb8zOHTrmg8YBBGUvQjkClJUW"),
+          name = "sepsis_data.csv")
+
+# Set the file permissions so anyone can download this file.
+sepsis_file %>% drive_share_anyone()
+```
+
+# Task 4: Make an ICU status report
+
+```{r}
+## Calling drive_deauth() prevents R from trying to authenticate via a browser
+## This is needed to make the GitHub Action work
+drive_deauth()
+file_link <- "https://drive.google.com/file/d/1m0oe6z-VUCgRpqPXXcGriXhPpSBFWzSt/view?usp=sharing"
+
+## All data up until now
+new_data <- updateData(file_link)
+
+## Include only most recent data
+most_recent_data <- new_data %>%
+  group_by(PatientID) %>%
+  filter(obsTime == max(obsTime))
+
+## Report time
+cur.time <- Sys.time()
+```
+
+## Report
+
+This report was generated on `r cur.time`.
+
+```{r}
+library(anytime)
+sepsis.patid<-most_recent_data %>% 
+  filter(SepsisLabel == 1) %>%
+  select(PatientID) %>%
+  unlist() %>%
+  c()
+
+most_recent_data %>% 
+  filter(SepsisLabel == 1) %>%
+  summarise("ICU Length of Stay" = ICULOS,"Heart Rate" =HR,"Temperature"=Temp, "Respiratory Rate" = Resp) %>%
+  kable(format = "html",caption = "Most recent Physio. Data For Those Who Have Sepsis")
+
+new_data %>%
+  filter(PatientID %in% sepsis.patid == TRUE) %>%
+  group_by(PatientID) %>%
+  ggplot(aes(x = ICULOS,y = HR, color = PatientID)) +
+  geom_point()+
+  geom_line()+
+  labs(x = "ICU Hours of Stay", y = "Heart Rate") +
+  ggtitle("Sepsis Patient History of Heart Rate in ICU")+
+  theme_bw()
+new_data %>%
+  filter(PatientID %in% sepsis.patid == TRUE) %>%
+  group_by(PatientID) %>%
+  ggplot(aes(x = ICULOS,y = Temp, color = PatientID)) +
+  geom_point()+
+  geom_line()+
+  labs(x = "ICU Hours of Stay", y = "Temperature") +
+  ggtitle("Sepsis Patient History of Temperature in ICU")+
+  theme_bw()
+new_data %>%
+  filter(PatientID %in% sepsis.patid == TRUE) %>%
+  group_by(PatientID) %>%
+  ggplot(aes(x = ICULOS,y = Resp, color = PatientID)) +
+  geom_point()+
+  geom_line()+
+  labs(x = "ICU Hours of Stay", y = "Respiratory Rate") +
+  ggtitle("Sepsis Patient History of Respiratory Rate in ICU")+
+  theme_bw()
+
+summ.tab<-new_data %>% 
+  group_by(PatientID) %>%
+  arrange(desc(obsTime)) %>%
+  slice_tail(n=2) %>%
+  summarise(obsTime,"Change_HR" = lag(HR)- HR,"Change_Temp" = lag(Temp)- Temp,"Change_Resp" = lag(Resp)- Resp) %>%
+mutate(Change_HR_color = case_when(
+  is.na(Change_HR) | Change_HR == 0 ~"yellow",
+  Change_HR > 0 ~ "green",
+  Change_HR < 0 ~ "red"),
+  
+  Change_Temp_color = case_when(
+  is.na(Change_Temp) | Change_Temp == 0 ~"yellow",
+  Change_Temp > 0 ~ "green",
+  Change_Temp < 0 ~ "red"),
+  
+  Change_Resp_color = case_when(
+  is.na(Change_Resp) | Change_Resp == 0 ~"yellow",
+  Change_Resp > 0 ~ "green",
+  Change_Resp < 0 ~ "red"),
+)
+summ.tab %>%
+  kable(format = "html",escape = FALSE) %>%
+  column_spec(3, color = summ.tab$Change_HR_color) %>%
+  column_spec(4, color = summ.tab$Change_Temp_color) %>%
+  column_spec(5, color = summ.tab$Change_Resp_color) %>%
+  kable_styling()
+  
+```
+
+The coloring only works with html files so unfortunately it does not show up here.
