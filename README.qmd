@@ -135,3 +135,5 @@ summ.tab %>%
   kable_styling()
   
 ```
+
+The coloring only works with html files so unfortunately it does not show up here.
