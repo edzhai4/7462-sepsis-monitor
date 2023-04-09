@@ -32,12 +32,14 @@ jobs:
             packages:
                any::knitr
                any::rmarkdown
-               any::jsonlite
+               any::tidyverse
                any::dplyr
                any::ggplot2
-               any::readr
+               any::kableExtra
                any::lubridate
-               any::forcats
+               any::data.table
+               any::googledrive
+               any::anytime
 
       - name: Render document
         uses: quarto-dev/quarto-actions/render@v2
