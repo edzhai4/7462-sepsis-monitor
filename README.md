@@ -1,11 +1,7 @@
 Assignment 7 - Task 3-6
 ================
 
-Report Last run ‘r Sys.time()’
-
-# Task 1 Setup
-
-# Task 3: Upload to Google Drive
+Report Last run `r Sys.time()`
 
 # Task 4: Make an ICU status report
 
