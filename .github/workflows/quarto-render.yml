@@ -40,6 +40,7 @@ jobs:
                any::data.table
                any::googledrive
                any::anytime
+               any::googleAuthR
                
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@main
