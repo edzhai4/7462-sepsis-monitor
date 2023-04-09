@@ -44,8 +44,8 @@ jobs:
       - name: Render document
         uses: quarto-dev/quarto-actions/render@v2
         with:
-          to: gfm
-          path: README.qmd
+          to: html
+          path: Assignment 7-Task 3-6.qmd
 
       - name: Setup git config
         run: |
